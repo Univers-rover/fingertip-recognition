@@ -40,8 +40,7 @@ int udp_server_init(void)
     return 0;
 }
 
-int main()
-{
+int main(){
     int i,x=0,y=0;
     int last_index = 0,this_index = 0;
     int recv_nbytes;
@@ -57,13 +56,12 @@ int main()
 
     socklen_t len = sizeof(client_addr);
 
-    while(1)
-    {
+    while(1){
         len = sizeof(client_addr);
         recv_nbytes = recvfrom(server_sock_fd, recv_buf, max_buf_size+1, 0, (struct sockaddr *)&client_addr, &len);
         //recv_buf[nbytes] = '\0';
-        recv_nbytes = recv_nbytes - 1;
-        this_index = (int)recv_buf[recv_nbytes];
+        recv_nbytes = recv_nbytes - 1;//接受位的大小
+        this_index = (int)recv_buf[recv_nbytes];//将序号字节强制转换为int
        // printf("recv %d bytes data,index=%d ,fb_pos%d\n",recv_nbytes, this_index, fb_write_position);
         //printf("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
         //将数据拷贝到fb_buf
@@ -71,15 +69,13 @@ int main()
         fb_write_position = fb_write_position + recv_nbytes;
 
         /* 判断是否是最后一包 */
-        if ( this_index!=255 )//没到最后一包就拷贝
-        {
+        if ( this_index!=255 ){//没到最后一包就拷贝
             if( ((this_index-1) == last_index) || last_index == 0 )//序号连续就正常循环
                 last_index = this_index;
             else
                 continue;
         }
-        else//相等表示是最后一包
-        {
+        else{//相等表示是最后一包
             //printf("fb loca c:%d\n", fb_buf);
             if(tip_posi(fb_buf, fb_write_position, &x, &y))//调用c++函数计算指尖位置
             {
@@ -97,6 +93,7 @@ int main()
         }
         //printf("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
     }
+    free(fb_buf);//释放内存
 
     return 0;
 }  

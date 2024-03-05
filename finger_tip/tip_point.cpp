@@ -10,7 +10,7 @@
 #include <opencv2/imgproc/types_c.h>
 //#include <opencv2/imgcodecs.hpp>
 //#include "opencv2/imgcodecs/legacy/constants_c.h"
-
+  
 #include "tip_point.h"
 
 using namespace std;
@@ -19,8 +19,7 @@ using namespace cv;
 Mat img;
 
 /* 肤色分割,将非肤色区域像素全置为0 */
-Mat YCrCb_Otsu_detect(Mat & src)
-{
+Mat YCrCb_Otsu_detect(Mat & src){
 	Mat ycrcb_image, detect;
 	cvtColor(src, ycrcb_image, CV_BGR2YCrCb); //首先将RGB转换成到YCrCb空间
 	
@@ -33,8 +32,7 @@ Mat YCrCb_Otsu_detect(Mat & src)
 }
 
 /* 计算轮廓并求重心 */
-void my_contour(Mat *src, vector<Point> *contours , Point *cen)
-{
+void my_contour(Mat *src, vector<Point> *contours , Point *cen){
     Moments M;    //声明一个图像的矩
     vector<vector<Point>> all_contours;
     vector<Point> out_contours;
@@ -51,7 +49,7 @@ void my_contour(Mat *src, vector<Point> *contours , Point *cen)
     //求取轮廓重心的Y坐标
     double cY = double(M.m01 / M.m00);
     
-    cen->x = (int)cX;
+    cen->x = (int)cX;              
     cen->y = (int)cY;
 
     /*
@@ -68,14 +66,12 @@ void my_contour(Mat *src, vector<Point> *contours , Point *cen)
 }
 
 /* 两点距离计算 */
-int cout_distance(Point &p1, Point &p2)
-{   
+int cout_distance(Point &p1, Point &p2){   
     return (int)sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y)); 
 }
 
 /* 指尖识别 */
-static int find_tip(Mat &src, Point *tip_points)
-{
+static int find_tip(Mat &src, Point *tip_points){
     unsigned int i;
     int tip_ind,mean_dis,max_dis=-999;
 
@@ -96,8 +92,7 @@ static int find_tip(Mat &src, Point *tip_points)
     my_contour(&binImage, &contours, &center);
     //cout<<"x="<<center.x<<"y="<<center.y<<endl;
 
-    for(i = 0; i<contours.size(); i++)
-    {
+    for(i = 0; i<contours.size(); i++){
         distances.push_back(cout_distance(contours[i], center));
         if(distances[i] > max_dis){
             max_dis = distances[i];
@@ -110,7 +105,6 @@ static int find_tip(Mat &src, Point *tip_points)
     //候选点到重心的距离大于边缘到重心平均距离的1.6倍，即为指尖；否则不是指尖，也就是说没有手指伸出
     if( distances[tip_ind] > (mean_dis*1.6) ){
         *tip_points=contours[tip_ind];
-        
         return 0;
     }
     else
@@ -118,8 +112,7 @@ static int find_tip(Mat &src, Point *tip_points)
 }
 
 //将系统时间转为字符串
-static string GetLocalTimeWithMs(void)
-{
+static string GetLocalTimeWithMs(void){
     string defaultTime = "19700101000000000";
     try
     {
@@ -147,7 +140,6 @@ static string GetLocalTimeWithMs(void)
     }
 }
 
-
 //************************************
 // Method:    TransBufferToMat
 // FullName:  图片buffer数据转换成 Mat数据格式;
@@ -160,8 +152,7 @@ static string GetLocalTimeWithMs(void)
 // Parameter: int nBandNum 每个像素包含数据个数 (1, 3, 4 ) 1:Gray 3:RGB 4:RGBA
 // Parameter: int nBPB  每个像素数据 所占位数(1, 2) 1:8位  2:16位;
 //************************************
-Mat TransBufferToMat(unsigned char* pBuffer, int nWidth, int nHeight, int nBandNum, int nBPB)
-{
+Mat TransBufferToMat(unsigned char* pBuffer, int nWidth, int nHeight, int nBandNum, int nBPB){
 	Mat mDst;
     /*
 	if (nBandNum == 4)
@@ -228,8 +219,7 @@ Mat TransBufferToMat(unsigned char* pBuffer, int nWidth, int nHeight, int nBandN
 	return mDst;
 }
 
-int tip_posi(unsigned char *fb, int len, int *x, int *y) 
-{
+int tip_posi(unsigned char *fb, int len, int *x, int *y){
     int i, err;
     Point p;
 
